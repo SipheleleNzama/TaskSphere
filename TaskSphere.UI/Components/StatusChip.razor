@@ -1,0 +1,28 @@
+﻿@using TaskSphere.Domain.Enums
+@using TaskStatus = TaskSphere.Domain.Enums.TaskStatus;
+
+
+<MudChip T="string" Color="@GetStatusColor()" Size="Size.Small" Icon="@GetStatusIcon()">
+    @Status.ToString()
+</MudChip>
+
+@code {
+    [Parameter]
+    public TaskStatus Status { get; set; }
+
+    private Color GetStatusColor() => Status switch
+    {
+        TaskStatus.ToDo => Color.Default,
+        TaskStatus.InProgress => Color.Primary,
+        TaskStatus.Done => Color.Success,
+        _ => Color.Default
+    };
+
+    private string GetStatusIcon() => Status switch
+    {
+        TaskStatus.ToDo => Icons.Material.Filled.Circle,
+        TaskStatus.InProgress => Icons.Material.Filled.Schedule,
+        TaskStatus.Done => Icons.Material.Filled.CheckCircle,
+        _ => Icons.Material.Filled.Circle
+    };
+}

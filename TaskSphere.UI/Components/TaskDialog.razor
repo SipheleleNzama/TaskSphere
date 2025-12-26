@@ -1,0 +1,100 @@
+﻿@using TaskSphere.Domain.Enums
+@using TaskStatus = TaskSphere.Domain.Enums.TaskStatus;
+
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            @(IsEdit ? "Edit Task" : "Create New Task")
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="form" @bind-IsValid="@success">
+            <MudTextField @bind-Value="Task.Title"
+                          Label="Title"
+                          Variant="Variant.Outlined"
+                          Required="true"
+                          RequiredError="Title is required"
+                          Class="mb-4" />
+
+            <MudTextField @bind-Value="Task.Description"
+                          Label="Description"
+                          Variant="Variant.Outlined"
+                          Lines="3"
+                          Class="mb-4" />
+
+            <MudSelect @bind-Value="Task.Status"
+                       Label="Status"
+                       Variant="Variant.Outlined"
+                       Required="true"
+                       Class="mb-4">
+                <MudSelectItem Value="@TaskStatus.ToDo">To Do</MudSelectItem>
+                <MudSelectItem Value="@TaskStatus.InProgress">In Progress</MudSelectItem>
+                <MudSelectItem Value="@TaskStatus.Done">Done</MudSelectItem>
+            </MudSelect>
+
+            <MudSelect @bind-Value="Task.Priority"
+                       Label="Priority"
+                       Variant="Variant.Outlined"
+                       Required="true"
+                       Class="mb-4">
+                <MudSelectItem Value="@TaskPriority.Low">Low</MudSelectItem>
+                <MudSelectItem Value="@TaskPriority.Medium">Medium</MudSelectItem>
+                <MudSelectItem Value="@TaskPriority.High">High</MudSelectItem>
+            </MudSelect>
+
+            <MudDatePicker @bind-Date="Task.DueDate"
+                           Label="Due Date"
+                           Variant="Variant.Outlined"
+                           Editable="true"
+                           Class="mb-4" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary"
+                   Variant="Variant.Filled"
+                   OnClick="Submit"
+                   Disabled="@(!success)">
+            @(IsEdit ? "Update" : "Create")
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public TaskDto Task { get; set; } = new();
+
+    [Parameter]
+    public bool IsEdit { get; set; }
+
+    MudForm form;
+    bool success;
+
+    protected override void OnInitialized()
+    {
+        if (Task.Id == 0)
+        {
+            Task = new TaskDto
+            {
+                Status = TaskStatus.ToDo,
+                Priority = TaskPriority.Medium
+            };
+        }
+    }
+
+    void Submit()
+    {
+        if (!IsEdit)
+        {
+            Task.Id = new Random().Next(100, 999);
+            Task.CreatedAt = DateTime.UtcNow;
+        }
+        MudDialog.Close(DialogResult.Ok(Task));
+    }
+
+    void Cancel() => MudDialog.Cancel();
+}
