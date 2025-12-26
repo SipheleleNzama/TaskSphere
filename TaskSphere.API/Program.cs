@@ -2,7 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using TaskSphere.Domain.Interfaces;
 using TaskSphere.Infrastructure.Data;
 using TaskSphere.Infrastructure.Repositories;
-
+using TaskSphere.Application.Mappings;
+using TaskSphere.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
 
 // Database
@@ -19,6 +21,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Repositories
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+// Services
+builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // CORS for Blazor
 builder.Services.AddCors(options =>
